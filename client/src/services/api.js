@@ -19,24 +19,49 @@ return config;
 
 });
 
+// API.interceptors.response.use(
+
+// (response)=>response,
+
+// (error)=>{
+
+// if(error.response?.status===401){
+
+// localStorage.clear();
+
+// window.location="/login";
+
+// }
+
+// return Promise.reject(error);
+
+// }
+
+// );
+
 API.interceptors.response.use(
 
-(response)=>response,
+  (response) => response,
 
-(error)=>{
+  (error) => {
 
-if(error.response?.status===401){
+    const url = error.config?.url || "";
 
-localStorage.clear();
+    // Login/Register par redirect mat karo
+    if (
+      error.response?.status === 401 &&
+      !url.includes("/auth/login") &&
+      !url.includes("/auth/register")
+    ) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
-window.location="/login";
+      window.location = "/login";
+    }
 
-}
-
-return Promise.reject(error);
-
-}
+    return Promise.reject(error);
+  }
 
 );
 
-export default API;
+ export default API;
