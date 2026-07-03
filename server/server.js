@@ -23,6 +23,9 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
+// ✅ Render ke liye ye line add karo
+app.set("trust proxy", 1);
+
 connectDB();
 
 app.use(cors());
