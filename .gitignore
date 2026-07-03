@@ -11,6 +11,9 @@ client/.env
 # Logs
 *.log
 
+# Uploaded resumes
+server/uploads/
+
 # Build
 dist/
 build/
@@ -18,3 +21,4 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
+
