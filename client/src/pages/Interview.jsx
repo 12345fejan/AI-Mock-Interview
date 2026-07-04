@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { FaMicrophone, FaStop } from "react-icons/fa";
 import API from "../services/api";
 
 const Interview = () => {
@@ -25,6 +26,75 @@ const Interview = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // 🎤 Speech Recognition States
+const [listening, setListening] = useState(false);
+const [recognition, setRecognition] = useState(null);
+
+  const startListening = () => {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert("Speech Recognition is not supported in this browser.");
+    return;
+  }
+
+  const recognitionInstance = new SpeechRecognition();
+
+  recognitionInstance.lang = "en-US";
+recognitionInstance.continuous = false;
+recognitionInstance.interimResults = false;
+
+  recognitionInstance.onstart = () => {
+    setListening(true);
+  };
+
+recognitionInstance.onresult = (event) => {
+
+  const transcript =
+    event.results[0][0].transcript;
+
+  setAnswer((prev) => {
+
+    if (prev.trim() === "") {
+      return transcript;
+    }
+
+    return prev + " " + transcript;
+
+  });
+
+};
+
+  recognitionInstance.onerror = (event) => {
+    console.log(event.error);
+  };
+
+ recognitionInstance.onend = () => {
+
+  setListening(false);
+
+  setRecognition(null);
+
+};
+
+  recognitionInstance.start();
+
+  setRecognition(recognitionInstance);
+};
+
+const stopListening = () => {
+
+  if (recognition) {
+
+    recognition.stop();
+
+    setListening(false);
+
+  }
+
+};
 
   // Save Answer & Go Next
   const nextQuestion = async () => {
@@ -94,6 +164,36 @@ const Interview = () => {
             onChange={(e) => setAnswer(e.target.value)}
             className="w-full border mt-8 rounded-lg p-4 outline-none focus:ring-2 focus:ring-blue-500"
           />
+
+          <div className="flex gap-4 mt-5">
+
+  {!listening ? (
+
+    <button
+    type="button"
+      onClick={startListening}
+      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2"
+    >
+      <FaMicrophone />
+
+      Start Speaking
+    </button>
+
+  ) : (
+
+    <button
+     type="button"
+      onClick={stopListening}
+      className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center gap-2"
+    >
+      <FaStop />
+
+      Stop Recording
+    </button>
+
+  )}
+
+</div>
 
           {/* Buttons */}
           <div className="flex justify-end mt-8">
